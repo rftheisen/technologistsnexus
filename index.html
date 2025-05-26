@@ -72,6 +72,8 @@
           height = window.innerHeight - margin.top - margin.bottom;
 
     const svg = d3.select("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -151,4 +153,26 @@
           return `M${o.y},${o.x}C${(o.y + d.y) / 2},${o.x} ${(o.y + d.y) / 2},${d.x} ${d.y},${d.x}`;
         });
 
-      link.mer
+      link.merge(linkEnter).transition()
+        .duration(300)
+        .attr('d', d => `M${d.source.y},${d.source.x}C${(d.source.y + d.target.y) / 2},${d.source.x} ${(d.source.y + d.target.y) / 2},${d.target.x} ${d.target.y},${d.target.x}`);
+
+      link.exit().transition()
+        .duration(300)
+        .attr('d', d => {
+          const o = { x: source.x, y: source.y };
+          return `M${o.y},${o.x}C${(o.y + d.y) / 2},${o.x} ${(o.y + d.y) / 2},${d.x} ${d.y},${d.x}`;
+        })
+        .remove();
+
+      nodes.forEach(d => {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      });
+    }
+
+    let i = 0;
+    update(root);
+  </script>
+</body>
+</html>
