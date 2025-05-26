@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Technologists Nexus Tree</title>
   <style>
     body {
-      margin: 0;
       font-family: sans-serif;
+      margin: 0;
       overflow: hidden;
     }
     svg {
@@ -24,7 +24,7 @@
     }
     .link {
       fill: none;
-      stroke: #aaa;
+      stroke: #ccc;
       stroke-width: 1.5px;
     }
   </style>
@@ -36,100 +36,119 @@
     const treeData = {
       name: "Technologists Nexus",
       children: [
-        {
-          name: "BCI",
-          children: [
-            { name: "Neuralink Human Implant" },
-            { name: "Speech Chip Translation" }
-          ]
-        },
-        {
-          name: "Cybersecurity",
-          children: [
-            { name: "Post-Quantum Encryption" },
-            { name: "Zero Trust Networks" }
-          ]
-        },
-        {
-          name: "Self-Driving Cars",
-          children: [
-            { name: "Waymo Safety Improvements" },
-            { name: "Tesla FSD Update" }
-          ]
-        },
-        {
-          name: "Quantum Computing",
-          children: [
-            { name: "Qubit Stability Breakthrough" },
-            { name: "IBM 1000+ Qubit Demo" }
-          ]
-        },
-        {
-          name: "Robotics",
-          children: [
-            { name: "Boston Dynamics AI" },
-            { name: "Surgical Microbots" }
-          ]
-        },
-        {
-          name: "IT & Cloud",
-          children: [
-            { name: "AWS Lambda Enhancements" },
-            { name: "Edge Container Systems" }
-          ]
-        },
-        {
-          name: "Computer Hardware",
-          children: [
-            { name: "Apple M5 Architecture Leak" },
-            { name: "NVIDIA's 5090 GPU Rumors" }
-          ]
-        }
+        { name: "BCI", children: [
+          { name: "Neuralink Human Implant" },
+          { name: "Speech Chip Translation" }
+        ] },
+        { name: "Cybersecurity", children: [
+          { name: "Post-Quantum Encryption" },
+          { name: "Zero Trust Networks" }
+        ] },
+        { name: "Self-Driving Cars", children: [
+          { name: "Waymo Safety Improvements" },
+          { name: "Tesla FSD Update" }
+        ] },
+        { name: "Quantum Computing", children: [
+          { name: "Qubit Stability Breakthrough" },
+          { name: "IBM 1000+ Qubit Demo" }
+        ] },
+        { name: "Robotics", children: [
+          { name: "Boston Dynamics AI" },
+          { name: "Surgical Microbots" }
+        ] },
+        { name: "IT & Cloud", children: [
+          { name: "AWS Lambda Enhancements" },
+          { name: "Edge Container Systems" }
+        ] },
+        { name: "Computer Hardware", children: [
+          { name: "Apple M5 Architecture Leak" },
+          { name: "NVIDIA's 5090 GPU Rumors" }
+        ] }
       ]
     };
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const margin = { top: 20, right: 90, bottom: 30, left: 90 },
+          width = window.innerWidth - margin.left - margin.right,
+          height = window.innerHeight - margin.top - margin.bottom;
 
     const svg = d3.select("svg")
-      .attr("viewBox", [-width / 2, -height / 2, width, height]);
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const treeLayout = d3.tree().size([2 * Math.PI, 400]);
     const root = d3.hierarchy(treeData);
-    treeLayout(root);
+    root.x0 = height / 2;
+    root.y0 = 0;
 
-    const radialPoint = (x, y) => [
-      y * Math.cos(x - Math.PI / 2),
-      y * Math.sin(x - Math.PI / 2)
-    ];
+    const treeLayout = d3.tree().size([height, width]);
 
-    svg.append("g")
-      .selectAll("path")
-      .data(root.links())
-      .join("path")
-      .attr("class", "link")
-      .attr("d", d3.linkRadial()
-        .angle(d => d.x)
-        .radius(d => d.y));
+    function collapse(d) {
+      if (d.children) {
+        d._children = d.children;
+        d._children.forEach(collapse);
+        d.children = null;
+      }
+    }
+    root.children.forEach(collapse);
 
-    const node = svg.append("g")
-      .selectAll("g")
-      .data(root.descendants())
-      .join("g")
-      .attr("class", "node")
-      .attr("transform", d => `translate(${radialPoint(d.x, d.y)})`);
+    function update(source) {
+      const treeData = treeLayout(root);
+      const nodes = treeData.descendants();
+      const links = treeData.links();
 
-    node.append("circle")
-      .attr("r", 5);
+      nodes.forEach(d => d.y = d.depth * 180);
 
-    node.append("text")
-      .attr("dy", "0.31em")
-      .attr("x", d => d.x < Math.PI === !d.children ? 6 : -6)
-      .attr("text-anchor", d => d.x < Math.PI === !d.children ? "start" : "end")
-      .attr("transform", d => `rotate(${(d.x * 180 / Math.PI - 90)})`)
-      .text(d => d.data.name)
-      .clone(true).lower()
-      .attr("stroke", "white");
-  </script>
-</body>
-</html>
+      const node = svg.selectAll('g.node')
+        .data(nodes, d => d.id || (d.id = ++i));
+
+      const nodeEnter = node.enter().append('g')
+        .attr('class', 'node')
+        .attr("transform", d => `translate(${source.y0},${source.x0})`)
+        .on("click", (event, d) => {
+          d.children = d.children ? null : d._children;
+          update(d);
+        });
+
+      nodeEnter.append('circle')
+        .attr('r', 1e-6)
+        .style("fill", d => d._children ? "#4f46e5" : "#fff")
+        .style("stroke", "#4f46e5")
+        .style("stroke-width", "2px");
+
+      nodeEnter.append('text')
+        .attr("dy", ".35em")
+        .attr("x", d => d.children || d._children ? -13 : 13)
+        .attr("text-anchor", d => d.children || d._children ? "end" : "start")
+        .text(d => d.data.name);
+
+      const nodeUpdate = nodeEnter.merge(node);
+
+      nodeUpdate.transition()
+        .duration(300)
+        .attr("transform", d => `translate(${d.y},${d.x})`);
+
+      nodeUpdate.select('circle')
+        .attr('r', 6)
+        .style("fill", d => d._children ? "#4f46e5" : "#fff");
+
+      const nodeExit = node.exit().transition()
+        .duration(300)
+        .attr("transform", d => `translate(${source.y},${source.x})`)
+        .remove();
+
+      nodeExit.select('circle')
+        .attr('r', 1e-6);
+
+      nodeExit.select('text')
+        .style('fill-opacity', 1e-6);
+
+      const link = svg.selectAll('path.link')
+        .data(links, d => d.target.id);
+
+      const linkEnter = link.enter().insert('path', "g")
+        .attr("class", "link")
+        .attr('d', d => {
+          const o = { x: source.x0, y: source.y0 };
+          return `M${o.y},${o.x}C${(o.y + d.y) / 2},${o.x} ${(o.y + d.y) / 2},${d.x} ${d.y},${d.x}`;
+        });
+
+      link.mer
