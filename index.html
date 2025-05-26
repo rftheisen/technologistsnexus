@@ -1,156 +1,135 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Technologists Nexus</title>
+  <title>Technologists Nexus Tree</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      color: #333;
       margin: 0;
-      padding: 0;
+      font-family: sans-serif;
+      overflow: hidden;
     }
-
-    header {
-      background-color: #1e2a38;
-      color: white;
-      padding: 1rem;
-      text-align: center;
+    svg {
+      width: 100vw;
+      height: 100vh;
     }
-
-    #search {
-      width: 90%;
-      margin: 1rem auto;
-      display: block;
-      padding: 0.5rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-
-    #tree {
-      padding: 1rem 2rem;
-    }
-
-    .category {
-      font-weight: bold;
+    .node circle {
+      fill: #4f46e5;
       cursor: pointer;
-      margin-top: 1rem;
-      padding: 0.75rem 1rem;
-      background-color: #e0e7ff;
-      border-radius: 12px;
-      transition: background-color 0.3s ease;
     }
-
-    .category:hover {
-      background-color: #c7d2fe;
+    .node text {
+      font-size: 14px;
+      fill: #333;
     }
-
-    .item-list {
-      list-style-type: none;
-      margin: 0.5rem 0 0.5rem 1rem;
-      padding: 0.5rem 1rem;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      display: none;
-    }
-
-    .item-list li {
-      margin: 0.2rem 0;
-    }
-
-    .item-list a {
-      text-decoration: none;
-      color: #007acc;
-      font-weight: normal;
-    }
-
-    .item-list a:hover::after {
-      content: attr(data-summary);
-      display: block;
-      font-size: 0.8rem;
-      color: #555;
-      margin-top: 0.2rem;
+    .link {
+      fill: none;
+      stroke: #aaa;
+      stroke-width: 1.5px;
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <header>
-      <h1>Technologists Nexus</h1>
-    </header>
-    <input type="text" id="search" placeholder="Search breakthroughs..." />
-    <div id="tree"></div>
-  </div>
-
+  <svg></svg>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
-    const data = {
-      "BCI": [
+    const treeData = {
+      name: "Technologists Nexus",
+      children: [
         {
-          "title": "Neuralink Successfully Implanted in Human",
-          "date": "2025-04-20",
-          "summary": "The first Neuralink device has been successfully tested in a human.",
-          "link": "https://example.com/neuralink"
-        }
-      ],
-      "Cybersecurity": [
+          name: "BCI",
+          children: [
+            { name: "Neuralink Human Implant" },
+            { name: "Speech Chip Translation" }
+          ]
+        },
         {
-          "title": "Post-Quantum Encryption Now Mandatory in Gov Contracts",
-          "date": "2025-05-10",
-          "summary": "The US government mandates quantum-resistant algorithms in federal systems.",
-          "link": "https://example.com/post-quantum"
+          name: "Cybersecurity",
+          children: [
+            { name: "Post-Quantum Encryption" },
+            { name: "Zero Trust Networks" }
+          ]
+        },
+        {
+          name: "Self-Driving Cars",
+          children: [
+            { name: "Waymo Safety Improvements" },
+            { name: "Tesla FSD Update" }
+          ]
+        },
+        {
+          name: "Quantum Computing",
+          children: [
+            { name: "Qubit Stability Breakthrough" },
+            { name: "IBM 1000+ Qubit Demo" }
+          ]
+        },
+        {
+          name: "Robotics",
+          children: [
+            { name: "Boston Dynamics AI" },
+            { name: "Surgical Microbots" }
+          ]
+        },
+        {
+          name: "IT & Cloud",
+          children: [
+            { name: "AWS Lambda Enhancements" },
+            { name: "Edge Container Systems" }
+          ]
+        },
+        {
+          name: "Computer Hardware",
+          children: [
+            { name: "Apple M5 Architecture Leak" },
+            { name: "NVIDIA's 5090 GPU Rumors" }
+          ]
         }
       ]
     };
 
-    const tree = document.getElementById("tree");
-    const searchInput = document.getElementById("search");
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-    function renderTree(filter = "") {
-      tree.innerHTML = "";
-      for (const category in data) {
-        const catEl = document.createElement("div");
-        catEl.className = "category";
-        catEl.textContent = category;
+    const svg = d3.select("svg")
+      .attr("viewBox", [-width / 2, -height / 2, width, height]);
 
-        const list = document.createElement("ul");
-        list.className = "item-list";
+    const treeLayout = d3.tree().size([2 * Math.PI, 400]);
+    const root = d3.hierarchy(treeData);
+    treeLayout(root);
 
-        data[category].forEach(item => {
-          if (
-            item.title.toLowerCase().includes(filter) ||
-            item.summary.toLowerCase().includes(filter)
-          ) {
-            const li = document.createElement("li");
-            const a = document.createElement("a");
-            a.href = item.link;
-            a.target = "_blank";
-            a.textContent = item.title;
-            a.setAttribute("data-summary", item.summary);
-            li.appendChild(a);
-            list.appendChild(li);
-          }
-        });
+    const radialPoint = (x, y) => [
+      y * Math.cos(x - Math.PI / 2),
+      y * Math.sin(x - Math.PI / 2)
+    ];
 
-        if (list.children.length > 0 || filter === "") {
-          catEl.addEventListener("click", () => {
-            list.style.display = list.style.display === "none" ? "block" : "none";
-          });
-          tree.appendChild(catEl);
-          tree.appendChild(list);
-        }
-      }
-    }
+    svg.append("g")
+      .selectAll("path")
+      .data(root.links())
+      .join("path")
+      .attr("class", "link")
+      .attr("d", d3.linkRadial()
+        .angle(d => d.x)
+        .radius(d => d.y));
 
-    searchInput.addEventListener("input", e => {
-      const term = e.target.value.trim().toLowerCase();
-      renderTree(term);
-    });
+    const node = svg.append("g")
+      .selectAll("g")
+      .data(root.descendants())
+      .join("g")
+      .attr("class", "node")
+      .attr("transform", d => `translate(${radialPoint(d.x, d.y)})`);
 
-    renderTree();
+    node.append("circle")
+      .attr("r", 5);
+
+    node.append("text")
+      .attr("dy", "0.31em")
+      .attr("x", d => d.x < Math.PI === !d.children ? 6 : -6)
+      .attr("text-anchor", d => d.x < Math.PI === !d.children ? "start" : "end")
+      .attr("transform", d => `rotate(${(d.x * 180 / Math.PI - 90)})`)
+      .text(d => d.data.name)
+      .clone(true).lower()
+      .attr("stroke", "white");
   </script>
 </body>
 </html>
