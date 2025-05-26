@@ -2,9 +2,9 @@ const data = {
   "BCI": [
     {
       "title": "Neuralink Successfully Implanted in Human",
-      "date": "2025-04-20",
-      "summary": "The first Neuralink device has been successfully tested in a human.",
-      "link": "https://example.com/neuralink"
+      "date": "2025-02-08",
+      "summary": "Neuralink Implants First Human",
+      "link": "https://www.theguardian.com/science/2025/feb/08/elon-musk-chip-paralysed-man-noland-arbaugh-chip-brain-neuralink"
     }
   ],
   "Cybersecurity": [
