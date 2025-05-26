@@ -8,11 +8,17 @@
     body {
       font-family: sans-serif;
       margin: 0;
-      overflow: hidden;
+    }
+    h1 {
+      text-align: center;
+      padding: 1rem;
+      background-color: #4f46e5;
+      color: white;
+      margin: 0;
     }
     svg {
       width: 100vw;
-      height: 100vh;
+      height: calc(100vh - 72px);
     }
     .node circle {
       fill: #4f46e5;
@@ -30,6 +36,7 @@
   </style>
 </head>
 <body>
+  <h1>Technologists Nexus</h1>
   <svg></svg>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
@@ -37,39 +44,39 @@
       name: "Start Here",
       children: [
         { name: "BCI", children: [
-          { name: "Neuralink Human Implant" },
-          { name: "Speech Chip Translation" }
+          { name: "Neuralink Human Implant", link: "https://example.com/neuralink" },
+          { name: "Speech Chip Translation", link: "https://example.com/speech-chip" }
         ] },
         { name: "Cybersecurity", children: [
-          { name: "Post-Quantum Encryption" },
-          { name: "Zero Trust Networks" }
+          { name: "Post-Quantum Encryption", link: "https://example.com/post-quantum" },
+          { name: "Zero Trust Networks", link: "https://example.com/zero-trust" }
         ] },
         { name: "Self-Driving Cars", children: [
-          { name: "Waymo Safety Improvements" },
-          { name: "Tesla FSD Update" }
+          { name: "Waymo Safety Improvements", link: "https://example.com/waymo" },
+          { name: "Tesla FSD Update", link: "https://example.com/tesla-fsd" }
         ] },
         { name: "Quantum Computing", children: [
-          { name: "Qubit Stability Breakthrough" },
-          { name: "IBM 1000+ Qubit Demo" }
+          { name: "Qubit Stability Breakthrough", link: "https://example.com/qubit-stability" },
+          { name: "IBM 1000+ Qubit Demo", link: "https://example.com/ibm-qubits" }
         ] },
         { name: "Robotics", children: [
-          { name: "Boston Dynamics AI" },
-          { name: "Surgical Microbots" }
+          { name: "Boston Dynamics AI", link: "https://example.com/boston-dynamics" },
+          { name: "Surgical Microbots", link: "https://example.com/microbots" }
         ] },
         { name: "IT & Cloud", children: [
-          { name: "AWS Lambda Enhancements" },
-          { name: "Edge Container Systems" }
+          { name: "AWS Lambda Enhancements", link: "https://example.com/aws-lambda" },
+          { name: "Edge Container Systems", link: "https://example.com/edge-containers" }
         ] },
         { name: "Computer Hardware", children: [
-          { name: "Apple M5 Architecture Leak" },
-          { name: "NVIDIA's 5090 GPU Rumors" }
+          { name: "Apple M5 Architecture Leak", link: "https://example.com/apple-m5" },
+          { name: "NVIDIA's 5090 GPU Rumors", link: "https://example.com/nvidia-5090" }
         ] }
       ]
     };
 
     const margin = { top: 20, right: 90, bottom: 30, left: 90 },
           width = window.innerWidth - margin.left - margin.right,
-          height = window.innerHeight - margin.top - margin.bottom;
+          height = window.innerHeight - margin.top - margin.bottom - 72;
 
     const svg = d3.select("svg")
       .attr("width", width + margin.left + margin.right)
@@ -106,8 +113,12 @@
         .attr('class', 'node')
         .attr("transform", d => `translate(${source.y0},${source.x0})`)
         .on("click", (event, d) => {
-          d.children = d.children ? null : d._children;
-          update(d);
+          if (d.data.link) {
+            window.open(d.data.link, '_blank');
+          } else {
+            d.children = d.children ? null : d._children;
+            update(d);
+          }
         });
 
       nodeEnter.append('circle')
