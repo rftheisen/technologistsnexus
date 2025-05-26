@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -12,42 +12,62 @@
       margin: 0;
       padding: 0;
     }
+
     header {
       background-color: #1e2a38;
       color: white;
       padding: 1rem;
       text-align: center;
     }
+
     #search {
       width: 90%;
       margin: 1rem auto;
       display: block;
       padding: 0.5rem;
-      border-radius: 4px;
+      border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 1rem;
     }
+
     #tree {
       padding: 1rem 2rem;
     }
+
     .category {
       font-weight: bold;
       cursor: pointer;
       margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background-color: #e0e7ff;
+      border-radius: 12px;
+      transition: background-color 0.3s ease;
     }
+
+    .category:hover {
+      background-color: #c7d2fe;
+    }
+
     .item-list {
       list-style-type: none;
       margin: 0.5rem 0 0.5rem 1rem;
-      padding: 0;
+      padding: 0.5rem 1rem;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       display: none;
     }
+
     .item-list li {
       margin: 0.2rem 0;
     }
+
     .item-list a {
       text-decoration: none;
       color: #007acc;
+      font-weight: normal;
     }
+
     .item-list a:hover::after {
       content: attr(data-summary);
       display: block;
@@ -66,6 +86,71 @@
     <div id="tree"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const data = {
+      "BCI": [
+        {
+          "title": "Neuralink Successfully Implanted in Human",
+          "date": "2025-04-20",
+          "summary": "The first Neuralink device has been successfully tested in a human.",
+          "link": "https://example.com/neuralink"
+        }
+      ],
+      "Cybersecurity": [
+        {
+          "title": "Post-Quantum Encryption Now Mandatory in Gov Contracts",
+          "date": "2025-05-10",
+          "summary": "The US government mandates quantum-resistant algorithms in federal systems.",
+          "link": "https://example.com/post-quantum"
+        }
+      ]
+    };
+
+    const tree = document.getElementById("tree");
+    const searchInput = document.getElementById("search");
+
+    function renderTree(filter = "") {
+      tree.innerHTML = "";
+      for (const category in data) {
+        const catEl = document.createElement("div");
+        catEl.className = "category";
+        catEl.textContent = category;
+
+        const list = document.createElement("ul");
+        list.className = "item-list";
+
+        data[category].forEach(item => {
+          if (
+            item.title.toLowerCase().includes(filter) ||
+            item.summary.toLowerCase().includes(filter)
+          ) {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = item.link;
+            a.target = "_blank";
+            a.textContent = item.title;
+            a.setAttribute("data-summary", item.summary);
+            li.appendChild(a);
+            list.appendChild(li);
+          }
+        });
+
+        if (list.children.length > 0 || filter === "") {
+          catEl.addEventListener("click", () => {
+            list.style.display = list.style.display === "none" ? "block" : "none";
+          });
+          tree.appendChild(catEl);
+          tree.appendChild(list);
+        }
+      }
+    }
+
+    searchInput.addEventListener("input", e => {
+      const term = e.target.value.trim().toLowerCase();
+      renderTree(term);
+    });
+
+    renderTree();
+  </script>
 </body>
 </html>
