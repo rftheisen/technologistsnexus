@@ -371,13 +371,26 @@
     const treeData = {
       name: "Start Here",
       children: [
-        { name: "AI & Machine Learning", children: [
-          { name: "Introducing GPT-5",              link: "https://openai.com/index/introducing-gpt-5/" },
-          { name: "Introducing GPT-5.2",            link: "https://openai.com/index/introducing-gpt-5-2/" },
-          { name: "Claude Opus 4.6 — Agent Teams",  link: "https://www.anthropic.com/news/claude-opus-4-6" },
-          { name: "Claude Sonnet 4.6 Released",     link: "https://www.anthropic.com/news/claude-sonnet-4-6" },
-          { name: "Gemini 3 Deep Think",            link: "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-deep-think/" },
-          { name: "xAI Grok 4.1 Launches",         link: "https://x.ai/news" }
+        { name: "AI", children: [
+          { name: "OpenAI", children: [
+            { name: "Introducing GPT-5",              link: "https://openai.com/index/introducing-gpt-5/" },
+            { name: "Introducing GPT-5.2",            link: "https://openai.com/index/introducing-gpt-5-2/" },
+            { name: "OpenAI + Disney Sora Deal",      link: "https://openai.com/index/disney-sora-agreement/" }
+          ]},
+          { name: "Anthropic", children: [
+            { name: "Claude Opus 4.6 — Agent Teams",  link: "https://www.anthropic.com/news/claude-opus-4-6" },
+            { name: "Claude Sonnet 4.6 Released",     link: "https://www.anthropic.com/news/claude-sonnet-4-6" },
+            { name: "Model Context Protocol (MCP)",   link: "https://www.anthropic.com/news/model-context-protocol" }
+          ]},
+          { name: "Google DeepMind", children: [
+            { name: "Gemini 3 Deep Think",            link: "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-deep-think/" },
+            { name: "Gemini Updates at Google I/O",   link: "https://blog.google/innovation-and-ai/models-and-research/google-deepmind/google-gemini-updates-io-2025/" },
+            { name: "Gemini Deep Research Agent",     link: "https://blog.google/technology/developers/deep-research-agent-gemini-api/" }
+          ]},
+          { name: "xAI", children: [
+            { name: "Grok 4.1 Launches",              link: "https://x.ai/news" },
+            { name: "xAI — Pentagon GenAI.mil Deal",  link: "https://seekingalpha.com/news/4534829-pentagon-will-add-xais-grok-to-its-ai-service-in-early-2026" }
+          ]}
         ]},
         { name: "BCI", children: [
           { name: "Neuralink Human Implant",        link: "https://www.theguardian.com/science/2025/feb/08/elon-musk-chip-paralysed-man-noland-arbaugh-chip-brain-neuralink" },
@@ -417,8 +430,7 @@
         ]},
         { name: "Software Development", children: [
           { name: "Agentic Coding in 2025",         link: "https://thenewstack.io/ai-engineering-trends-in-2025-agents-mcp-and-vibe-coding/" },
-          { name: "GitHub Copilot Workspace",       link: "https://github.blog/news-insights/product-news/github-copilot-workspace/" },
-          { name: "Model Context Protocol (MCP)",   link: "https://www.anthropic.com/news/model-context-protocol" }
+          { name: "GitHub Copilot Workspace",       link: "https://github.blog/news-insights/product-news/github-copilot-workspace/" }
         ]},
         { name: "Computer Hardware", children: [
           { name: "Apple M4 Architecture",          link: "https://www.apple.com/newsroom/2024/05/apple-introduces-m4-chip/" },
