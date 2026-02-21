@@ -7,6 +7,40 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+    /* ── Theme tokens ──────────────────────────────────────────────────── */
+    :root {
+      --bg:              #0d0b1e;
+      --bg-g1:           rgba(99,102,241,0.28);
+      --bg-g2:           rgba(139,92,246,0.22);
+      --bg-g3:           rgba(59,130,246,0.18);
+      --dot:             rgba(255,255,255,0.035);
+      --text:            rgba(255,255,255,0.88);
+      --text-dim:        rgba(255,255,255,0.22);
+      --header-bg:       rgba(255,255,255,0.05);
+      --header-border:   rgba(255,255,255,0.08);
+      --input-bg:        rgba(255,255,255,0.08);
+      --input-border:    rgba(255,255,255,0.14);
+      --glass-bg:        rgba(255,255,255,0.05);
+      --glass-border:    rgba(255,255,255,0.1);
+      --ctrl-text:       rgba(255,255,255,0.75);
+    }
+    html[data-theme="light"] {
+      --bg:              #eeedf8;
+      --bg-g1:           rgba(99,102,241,0.14);
+      --bg-g2:           rgba(139,92,246,0.10);
+      --bg-g3:           rgba(59,130,246,0.10);
+      --dot:             rgba(0,0,0,0.04);
+      --text:            rgba(15,12,40,0.88);
+      --text-dim:        rgba(15,12,40,0.3);
+      --header-bg:       rgba(255,255,255,0.7);
+      --header-border:   rgba(0,0,0,0.08);
+      --input-bg:        rgba(0,0,0,0.05);
+      --input-border:    rgba(0,0,0,0.12);
+      --glass-bg:        rgba(255,255,255,0.55);
+      --glass-border:    rgba(0,0,0,0.08);
+      --ctrl-text:       rgba(15,12,40,0.65);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -16,13 +50,14 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      background-color: #0d0b1e;
+      background-color: var(--bg);
       background-image:
-        radial-gradient(ellipse 70% 60% at 10% 5%,  rgba(99,102,241,0.28) 0%, transparent 65%),
-        radial-gradient(ellipse 55% 55% at 90% 90%, rgba(139,92,246,0.22) 0%, transparent 65%),
-        radial-gradient(ellipse 45% 45% at 75% 15%, rgba(59,130,246,0.18) 0%, transparent 60%);
+        radial-gradient(ellipse 70% 60% at 10% 5%,  var(--bg-g1) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 55% at 90% 90%, var(--bg-g2) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 45% at 75% 15%, var(--bg-g3) 0%, transparent 60%);
       background-attachment: fixed;
-      color: rgba(255,255,255,0.88);
+      color: var(--text);
+      transition: background-color 0.4s, color 0.4s;
     }
 
     /* Dot-grid texture overlay */
@@ -30,7 +65,7 @@
       content: '';
       position: fixed;
       inset: 0;
-      background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-image: radial-gradient(var(--dot) 1px, transparent 1px);
       background-size: 28px 28px;
       pointer-events: none;
       z-index: 0;
@@ -40,11 +75,12 @@
 
     /* ── Header ────────────────────────────────────────────────────────── */
     header {
-      background: rgba(255,255,255,0.05);
+      background: var(--header-bg);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid var(--header-border);
       padding: 18px 32px;
+      transition: background 0.4s, border-color 0.4s;
     }
 
     .header-content {
@@ -98,15 +134,15 @@
       padding: 9px 36px 9px 38px;
       font-size: 0.875rem;
       font-family: inherit;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
       border-radius: 980px;
-      color: #fff;
+      color: var(--text);
       outline: none;
       transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
 
-    #search-input::placeholder { color: rgba(255,255,255,0.35); }
+    #search-input::placeholder { color: var(--text-dim); }
     #search-input:focus {
       background: rgba(255,255,255,0.12);
       border-color: rgba(167,139,250,0.5);
@@ -151,28 +187,21 @@
       transition: filter 0.2s, r 0.15s;
     }
 
+    /* Per-category hover glow is applied via JS; keep a subtle fallback */
     .node:hover circle {
-      filter: drop-shadow(0 0 7px rgba(167,139,250,0.55));
+      filter: brightness(1.15);
     }
 
     .node text {
       font-size: 12px;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      fill: rgba(255,255,255,0.82);
+      fill: var(--text);
       pointer-events: none;
       user-select: none;
     }
 
-    .node.leaf circle {
-      filter: drop-shadow(0 0 4px rgba(129,140,248,0.45));
-    }
-
-    .node.leaf:hover circle {
-      filter: drop-shadow(0 0 9px rgba(129,140,248,0.75));
-    }
-
+    /* Leaf node glow & text color come from JS (per category color) */
     .node.leaf text {
-      fill: #a5b4fc;
       text-decoration: underline;
       text-underline-offset: 2px;
       cursor: pointer;
@@ -183,8 +212,8 @@
 
     .link {
       fill: none;
-      stroke: rgba(255,255,255,0.1);
       stroke-width: 1.5px;
+      /* stroke color set per-link in JS based on category color */
     }
 
     /* ── Floating controls ─────────────────────────────────────────────── */
@@ -203,10 +232,10 @@
       font-family: inherit;
       font-weight: 500;
       letter-spacing: 0.02em;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
       border-radius: 10px;
-      color: rgba(255,255,255,0.75);
+      color: var(--ctrl-text);
       cursor: pointer;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -215,9 +244,9 @@
     }
 
     .ctrl-btn:hover {
-      background: rgba(255,255,255,0.13);
-      border-color: rgba(255,255,255,0.22);
-      color: #fff;
+      background: var(--input-bg);
+      border-color: var(--input-border);
+      color: var(--text);
     }
 
     /* ── Legend ────────────────────────────────────────────────────────── */
@@ -225,14 +254,15 @@
       position: absolute;
       bottom: 18px;
       left: 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
       border-radius: 12px;
       padding: 10px 14px;
       font-size: 0.7rem;
-      color: rgba(255,255,255,0.45);
+      color: var(--ctrl-text);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+      transition: background 0.4s, border-color 0.4s;
     }
 
     .legend div {
@@ -264,8 +294,123 @@
       top: 12px;
       right: 18px;
       font-size: 0.68rem;
-      color: rgba(255,255,255,0.22);
+      color: var(--text-dim);
       letter-spacing: 0.02em;
+    }
+
+    /* ── Theme toggle button ────────────────────────────────────────────── */
+    #theme-toggle {
+      margin-left: auto;
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: var(--ctrl-text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: background 0.2s, color 0.2s, transform 0.3s;
+    }
+    #theme-toggle:hover { background: var(--input-bg); color: var(--text); transform: rotate(18deg); }
+    /* swap icons based on theme */
+    #theme-toggle .icon-sun  { display: none; }
+    #theme-toggle .icon-moon { display: block; }
+    html[data-theme="light"] #theme-toggle .icon-sun  { display: block; }
+    html[data-theme="light"] #theme-toggle .icon-moon { display: none; }
+
+    /* ── Mini-map ──────────────────────────────────────────────────────── */
+    #mini-map {
+      position: absolute;
+      bottom: 132px; /* sits above the 3-button controls stack */
+      right: 18px;
+      width: 162px;
+      height: 104px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      opacity: 0.82;
+      transition: opacity 0.2s;
+    }
+    #mini-map:hover { opacity: 1; }
+    #mini-map > svg { width: 100%; height: 100%; }
+    .mini-label {
+      position: absolute;
+      top: 5px;
+      left: 8px;
+      font-size: 0.52rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      pointer-events: none;
+    }
+
+    /* ── Hover tooltip ─────────────────────────────────────────────────── */
+    #hover-tooltip {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      max-width: 272px;
+      min-width: 200px;
+      background: rgba(18,16,40,0.82);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      box-shadow: 0 20px 56px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+      padding: 14px 16px 12px;
+      opacity: 0;
+      transform: translateY(6px) scale(0.96);
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+    #hover-tooltip.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .tt-accent {
+      height: 2px;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+    .tt-source {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+    .tt-favicon {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .tt-domain {
+      font-size: 0.67rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.04em;
+    }
+    .tt-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+    .tt-cta {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.35);
     }
 
     /* ── Search results panel ──────────────────────────────────────────── */
@@ -347,15 +492,52 @@
           </svg>
         </button>
       </div>
+      <button id="theme-toggle" aria-label="Toggle light/dark mode">
+        <!-- Moon icon (shown in dark mode) -->
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun icon (shown in light mode) -->
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
     </div>
   </header>
 
   <div id="tree-container">
     <svg></svg>
+
+    <!-- Hover tooltip -->
+    <div id="hover-tooltip">
+      <div class="tt-accent" id="tt-accent"></div>
+      <div class="tt-source">
+        <img class="tt-favicon" id="tt-favicon" src="" alt="">
+        <span class="tt-domain" id="tt-domain"></span>
+      </div>
+      <div class="tt-title" id="tt-title"></div>
+      <div class="tt-cta">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        Click to open article
+      </div>
+    </div>
+
     <div class="legend">
       <div><span class="legend-dot category"></span> Category</div>
       <div><span class="legend-dot leaf"></span> Article</div>
     </div>
+    <div id="mini-map">
+      <span class="mini-label">Overview</span>
+      <svg id="mini-svg"></svg>
+    </div>
+
     <div class="tree-controls">
       <button class="ctrl-btn" id="btn-expand">Expand All</button>
       <button class="ctrl-btn" id="btn-collapse">Collapse All</button>
@@ -368,6 +550,36 @@
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
+    // ── Category colour palette ───────────────────────────────────────────────
+    const CATEGORY_COLORS = {
+      "AI":                   { node: "#818cf8", glow: "rgba(129,140,248,0.7)", link: "rgba(129,140,248,0.28)" },
+      "BCI":                  { node: "#34d399", glow: "rgba(52,211,153,0.7)",  link: "rgba(52,211,153,0.28)"  },
+      "Cybersecurity":        { node: "#f87171", glow: "rgba(248,113,113,0.7)", link: "rgba(248,113,113,0.28)" },
+      "Self-Driving Cars":    { node: "#fbbf24", glow: "rgba(251,191,36,0.7)",  link: "rgba(251,191,36,0.28)"  },
+      "Quantum Computing":    { node: "#60a5fa", glow: "rgba(96,165,250,0.7)",  link: "rgba(96,165,250,0.28)"  },
+      "Robotics":             { node: "#f472b6", glow: "rgba(244,114,182,0.7)", link: "rgba(244,114,182,0.28)" },
+      "Space Technology":     { node: "#a78bfa", glow: "rgba(167,139,250,0.7)", link: "rgba(167,139,250,0.28)" },
+      "AR / VR":              { node: "#2dd4bf", glow: "rgba(45,212,191,0.7)",  link: "rgba(45,212,191,0.28)"  },
+      "IT & Cloud":           { node: "#fb923c", glow: "rgba(251,146,60,0.7)",  link: "rgba(251,146,60,0.28)"  },
+      "Software Development": { node: "#4ade80", glow: "rgba(74,222,128,0.7)",  link: "rgba(74,222,128,0.28)"  },
+      "Computer Hardware":    { node: "#e879f9", glow: "rgba(232,121,249,0.7)", link: "rgba(232,121,249,0.28)" },
+    };
+    const DEFAULT_COLOR = { node: "#94a3b8", glow: "rgba(148,163,184,0.6)", link: "rgba(148,163,184,0.2)" };
+
+    // Helpers — derive colour for any node from its depth-1 ancestor
+    function getCatColor(d) {
+      return d.data._catColor || DEFAULT_COLOR;
+    }
+    function nodeCircleFill(d) {
+      const c = getCatColor(d);
+      if (d.data.link) return c.node;
+      return d._children ? c.node + "30" : c.node + "12";
+    }
+    function nodeCircleStroke(d) {
+      const c = getCatColor(d);
+      return d.data.link ? c.node : c.node + "80";
+    }
+
     const treeData = {
       name: "Start Here",
       children: [
@@ -463,10 +675,17 @@
 
     const treeLayout = d3.tree();
 
+    // Must be declared before the zoom handler fires (zoom.transform call triggers it)
+    let lastTransform = d3.zoomIdentity.translate(margin.left, margin.top);
+
     // Zoom behavior
     const zoom = d3.zoom()
       .scaleExtent([0.15, 3])
-      .on("zoom", event => g.attr("transform", event.transform));
+      .on("zoom", event => {
+        g.attr("transform", event.transform);
+        lastTransform = event.transform;
+        updateMiniMap();
+      });
 
     svgEl.call(zoom).on("dblclick.zoom", null);
 
@@ -481,6 +700,17 @@
     const root = d3.hierarchy(treeData);
     root.x0 = height / 2;
     root.y0 = 0;
+
+    // Stamp each node's data with its root-category colour
+    function stampColors(node, color) {
+      node.data._catColor = color;
+      (node.children || []).forEach(c => stampColors(c, color));
+    }
+    root.data._catColor = DEFAULT_COLOR;
+    root.children.forEach(child => {
+      const col = CATEGORY_COLORS[child.data.name] || DEFAULT_COLOR;
+      stampColors(child, col);
+    });
 
     function collapse(d) {
       if (d.children) {
@@ -504,6 +734,8 @@
 
     // ── Update ───────────────────────────────────────────────────────────────
 
+    let isFirstRender = true;
+
     function update(source) {
       const { width: w, height: h } = getSize();
       treeLayout.size([h, w]);
@@ -514,12 +746,16 @@
 
       nodes.forEach(d => d.y = d.depth * 210);
 
+      const dur   = isFirstRender ? 600 : 280;
+      const delay = isFirstRender ? d => d.depth * 90 : 0;
+
       // Nodes
       const node = g.selectAll("g.node").data(nodes, d => d.id || (d.id = ++nodeId));
 
       const nodeEnter = node.enter().append("g")
         .attr("class", d => "node" + (d.data.link ? " leaf" : ""))
         .attr("transform", () => `translate(${source.y0},${source.x0})`)
+        .style("opacity", isFirstRender ? 0 : 1)
         .on("click", (event, d) => {
           if (d.data.link) {
             window.open(d.data.link, "_blank", "noopener,noreferrer");
@@ -531,14 +767,15 @@
 
       nodeEnter.append("circle")
         .attr("r", 1e-6)
-        .style("fill",         d => d.data.link ? "#818cf8" : (d._children ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)"))
-        .style("stroke",       d => d.data.link ? "#818cf8" : "rgba(255,255,255,0.4)")
+        .style("fill",         nodeCircleFill)
+        .style("stroke",       nodeCircleStroke)
         .style("stroke-width", d => d.data.link ? "0" : "1.5px");
 
       nodeEnter.append("text")
         .attr("dy", ".35em")
         .attr("x", d => (d.children || d._children) ? -13 : 13)
         .attr("text-anchor", d => (d.children || d._children) ? "end" : "start")
+        .style("fill", d => d.data.link ? getCatColor(d).node : null)
         .text(d => d.data.name);
 
       // Append title for native tooltip on leaf nodes
@@ -547,24 +784,33 @@
 
       const nodeUpdate = nodeEnter.merge(node);
 
-      nodeUpdate.transition().duration(280)
-        .attr("transform", d => `translate(${d.y},${d.x})`);
+      nodeUpdate.transition().duration(dur).delay(delay)
+        .attr("transform", d => `translate(${d.y},${d.x})`)
+        .style("opacity", 1);
 
       nodeUpdate.select("circle")
         .attr("r", d => d.data.link ? 6 : 5)
-        .style("fill",   d => d.data.link ? "#818cf8" : (d._children ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.06)"))
-        .style("stroke", d => d.data.link ? "#818cf8" : "rgba(255,255,255,0.4)")
+        .style("fill",         nodeCircleFill)
+        .style("stroke",       nodeCircleStroke)
         .style("stroke-width", d => d.data.link ? "0" : "1.5px");
 
       nodeUpdate.attr("class", d => "node" + (d.data.link ? " leaf" : ""));
 
+      // Tooltip hover — only for leaf (article) nodes
+      nodeUpdate
+        .on("mouseenter.tt", (event, d) => { if (d.data.link) showTooltip(event, d); })
+        .on("mousemove.tt",  (event, d) => { if (d.data.link) positionTooltip(event); })
+        .on("mouseleave.tt", ()         => hideTooltip());
+
       // Update text anchor when expand/collapse changes
       nodeUpdate.select("text")
         .attr("x", d => (d.children || d._children) ? -13 : 13)
-        .attr("text-anchor", d => (d.children || d._children) ? "end" : "start");
+        .attr("text-anchor", d => (d.children || d._children) ? "end" : "start")
+        .style("fill", d => d.data.link ? getCatColor(d).node : null);
 
       node.exit().transition().duration(280)
         .attr("transform", () => `translate(${source.y},${source.x})`)
+        .style("opacity", 0)
         .remove()
         .select("circle").attr("r", 1e-6);
 
@@ -573,18 +819,23 @@
 
       link.enter().insert("path", "g")
         .attr("class", "link")
+        .style("opacity", isFirstRender ? 0 : 1)
+        .style("stroke", d => getCatColor(d.target).link)
         .attr("d", () => {
           const o = { x: source.x0, y: source.y0 };
           return `M${o.y},${o.x}C${o.y+90},${o.x} ${o.y+90},${o.x} ${o.y},${o.x}`;
         })
         .merge(link)
-        .transition().duration(280)
+        .transition().duration(dur).delay(delay instanceof Function ? d => delay(d.target) : 0)
+        .style("opacity", 1)
+        .style("stroke", d => getCatColor(d.target).link)
         .attr("d", d => {
           const mx = (d.source.y + d.target.y) / 2;
           return `M${d.source.y},${d.source.x}C${mx},${d.source.x} ${mx},${d.target.x} ${d.target.y},${d.target.x}`;
         });
 
       link.exit().transition().duration(280)
+        .style("opacity", 0)
         .attr("d", () => {
           const o = { x: source.x, y: source.y };
           return `M${o.y},${o.x}C${o.y+90},${o.x} ${o.y+90},${o.x} ${o.y},${o.x}`;
@@ -592,6 +843,10 @@
         .remove();
 
       nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+      isFirstRender = false;
+
+      // Redraw mini-map after the tree transition finishes
+      setTimeout(updateMiniMap, dur + 60);
     }
 
     update(root);
@@ -617,6 +872,123 @@
     window.addEventListener("resize", () => {
       const s = getSize();
       width = s.width; height = s.height;
+      update(root);
+    });
+
+    // ── Mini-map ─────────────────────────────────────────────────────────────
+
+    const MINI_W = 162, MINI_H = 104;
+    const miniSvg = d3.select("#mini-svg");
+
+    function updateMiniMap() {
+      const allNodes = [];
+      g.selectAll("g.node").each(function(d) { allNodes.push(d); });
+      if (!allNodes.length) return;
+
+      // Bounding box of all visible nodes (in tree-space: d.y = horiz, d.x = vert)
+      let minY = Infinity, maxY = -Infinity, minX = Infinity, maxX = -Infinity;
+      allNodes.forEach(d => {
+        if (d.y != null) { minY = Math.min(minY, d.y); maxY = Math.max(maxY, d.y); }
+        if (d.x != null) { minX = Math.min(minX, d.x); maxX = Math.max(maxX, d.x); }
+      });
+
+      const pad = 14;
+      const tW  = Math.max(maxY - minY, 1);
+      const tH  = Math.max(maxX - minX, 1);
+      const sc  = Math.min((MINI_W - 2 * pad) / tW, (MINI_H - 2 * pad) / tH);
+      // Centre the tree within the mini-map
+      const offY = pad + ((MINI_W - 2 * pad) - tW * sc) / 2 - minY * sc;
+      const offX = pad + ((MINI_H - 2 * pad) - tH * sc) / 2 - minX * sc;
+
+      miniSvg.selectAll("*").remove();
+
+      // Links
+      g.selectAll("path.link").each(function(d) {
+        const col = getCatColor(d.target).link;
+        miniSvg.append("line")
+          .attr("x1", d.source.y * sc + offY).attr("y1", d.source.x * sc + offX)
+          .attr("x2", d.target.y * sc + offY).attr("y2", d.target.x * sc + offX)
+          .attr("stroke", col).attr("stroke-width", 0.7);
+      });
+
+      // Nodes
+      allNodes.forEach(d => {
+        const col = getCatColor(d).node;
+        miniSvg.append("circle")
+          .attr("cx", d.y * sc + offY)
+          .attr("cy", d.x * sc + offX)
+          .attr("r",  d.data.link ? 1.4 : 2)
+          .attr("fill",   d.data.link ? col : "none")
+          .attr("stroke", col)
+          .attr("stroke-width", d.data.link ? 0 : 0.8);
+      });
+
+      // Viewport rectangle
+      const t  = lastTransform;
+      const cw = container.getBoundingClientRect().width;
+      const ch = container.getBoundingClientRect().height;
+      const vL = (0   - t.x) / t.k, vR = (cw - t.x) / t.k;
+      const vT = (0   - t.y) / t.k, vB = (ch - t.y) / t.k;
+      miniSvg.append("rect")
+        .attr("x",      vL * sc + offY).attr("y",      vT * sc + offX)
+        .attr("width",  (vR - vL) * sc).attr("height", (vB - vT) * sc)
+        .attr("fill",   "rgba(255,255,255,0.04)")
+        .attr("stroke", "rgba(255,255,255,0.35)")
+        .attr("stroke-width", 1).attr("rx", 2);
+    }
+
+    // ── Hover Tooltip ────────────────────────────────────────────────────────
+
+    const tooltip   = document.getElementById("hover-tooltip");
+    const ttAccent  = document.getElementById("tt-accent");
+    const ttFavicon = document.getElementById("tt-favicon");
+    const ttDomain  = document.getElementById("tt-domain");
+    const ttTitle   = document.getElementById("tt-title");
+
+    function parseDomain(url) {
+      try { return new URL(url).hostname.replace(/^www\./, ""); }
+      catch { return url; }
+    }
+
+    let tooltipTarget = null;
+
+    function showTooltip(event, d) {
+      tooltipTarget = d;
+      const col    = getCatColor(d);
+      const domain = parseDomain(d.data.link);
+      ttTitle.textContent  = d.data.name;
+      ttDomain.textContent = domain;
+      ttFavicon.src        = `https://www.google.com/s2/favicons?sz=32&domain=${domain}`;
+      ttAccent.style.background = col.node;
+      tooltip.classList.add("visible");
+      positionTooltip(event);
+    }
+
+    function positionTooltip(event) {
+      const TW = 272, TH = 110, PAD = 12;
+      let x = event.clientX + 16;
+      let y = event.clientY + 16;
+      if (x + TW + PAD > window.innerWidth)  x = event.clientX - TW - 12;
+      if (y + TH + PAD > window.innerHeight) y = event.clientY - TH - 12;
+      tooltip.style.left = x + "px";
+      tooltip.style.top  = y + "px";
+    }
+
+    function hideTooltip() {
+      tooltip.classList.remove("visible");
+      tooltipTarget = null;
+    }
+
+    // Attach tooltip events on every update via nodeUpdate
+    // (done inside update() after nodeUpdate is built)
+
+    // ── Theme toggle ─────────────────────────────────────────────────────────
+
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+      const html = document.documentElement;
+      const isLight = html.getAttribute("data-theme") === "light";
+      html.setAttribute("data-theme", isLight ? "dark" : "light");
+      // Re-render so D3-inlined SVG text colours update too
       update(root);
     });
 
