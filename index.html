@@ -3,95 +3,411 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Technologists Nexus Tree</title>
+  <title>Technologists Nexus</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: sans-serif;
-      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
     }
-    h1 {
-      text-align: center;
-      padding: 1rem;
-      background-color: #4f46e5;
-      color: white;
-      margin: 0;
+
+    /* Header */
+    header {
+      background: #4f46e5;
+      padding: 20px 32px;
     }
-    svg {
-      width: 100vw;
-      height: calc(100vh - 72px);
+
+    .header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
     }
+
+    .header-text {
+      flex: 0 0 auto;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    header p.subtitle {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.65);
+      margin-top: 2px;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 400px;
+    }
+
+    .search-wrapper svg {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.6);
+      pointer-events: none;
+    }
+
+    #search-input {
+      width: 100%;
+      padding: 9px 36px 9px 38px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 980px;
+      color: #fff;
+      outline: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    #search-input::placeholder { color: rgba(255,255,255,0.5); }
+    #search-input:focus {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    #clear-search {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      display: none;
+      padding: 2px;
+      line-height: 0;
+    }
+    #clear-search:hover { color: #fff; }
+
+    /* Tree container */
+    #tree-container {
+      width: 100%;
+      height: calc(100vh - 84px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    #tree-container svg {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+
+    #tree-container svg:active { cursor: grabbing; }
+
     .node circle {
+      cursor: pointer;
+      transition: r 0.15s;
+    }
+
+    .node text {
+      font-size: 12.5px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      fill: #1d1d1f;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .node.leaf text {
       fill: #4f46e5;
+      text-decoration: underline;
       cursor: pointer;
     }
-    .node text {
-      font-size: 14px;
-      fill: #333;
+
+    .node.dimmed circle { opacity: 0.2; }
+    .node.dimmed text   { opacity: 0.2; }
+
+    .node.highlighted circle {
+      filter: drop-shadow(0 0 4px rgba(79,70,229,0.5));
     }
+
     .link {
       fill: none;
-      stroke: #ccc;
+      stroke: #d2d2d7;
       stroke-width: 1.5px;
     }
+
+    /* Floating controls */
+    .tree-controls {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ctrl-btn {
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      font-family: inherit;
+      font-weight: 500;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid #e5e5ea;
+      border-radius: 8px;
+      color: #1d1d1f;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: background 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+    .ctrl-btn:hover {
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Legend */
+    .legend {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #e5e5ea;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-size: 0.72rem;
+      color: #6e6e73;
+      backdrop-filter: blur(8px);
+    }
+
+    .legend div {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 3px;
+    }
+    .legend div:last-child { margin-bottom: 0; }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-dot.category { background: #fff; border: 2px solid #4f46e5; }
+    .legend-dot.leaf     { background: #4f46e5; }
+
+    /* Zoom hint */
+    .zoom-hint {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      font-size: 0.7rem;
+      color: #aeaeb2;
+    }
+
+    /* Search results panel */
+    #search-results {
+      display: none;
+      max-width: 860px;
+      margin: 28px auto;
+      padding: 0 24px;
+    }
+
+    .results-header {
+      font-size: 0.85rem;
+      color: #6e6e73;
+      margin-bottom: 18px;
+    }
+
+    .result-category {
+      margin-bottom: 24px;
+    }
+
+    .result-category h3 {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6e6e73;
+      margin-bottom: 8px;
+    }
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      padding: 13px 16px;
+      background: #fff;
+      border: 1px solid #e5e5ea;
+      border-radius: 10px;
+      margin-bottom: 7px;
+      text-decoration: none;
+      color: #1d1d1f;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .result-item:hover {
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+    .result-item svg { flex-shrink: 0; margin-left: auto; color: #aeaeb2; }
+    .result-item span { font-size: 0.92rem; font-weight: 500; }
+
+    .empty-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6e6e73;
+    }
+    .empty-results p { font-size: 1rem; margin-top: 12px; }
   </style>
 </head>
 <body>
-  <h1>Technologists Nexus</h1>
-  <svg></svg>
+  <header>
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Technologists Nexus</h1>
+        <p class="subtitle">Click categories to expand &amp; explore</p>
+      </div>
+      <div class="search-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search technologies, categories…">
+        <button id="clear-search" aria-label="Clear search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="tree-container">
+    <svg></svg>
+    <div class="legend">
+      <div><span class="legend-dot category"></span> Category</div>
+      <div><span class="legend-dot leaf"></span> Article</div>
+    </div>
+    <div class="tree-controls">
+      <button class="ctrl-btn" id="btn-expand">Expand All</button>
+      <button class="ctrl-btn" id="btn-collapse">Collapse All</button>
+      <button class="ctrl-btn" id="btn-reset">Reset View</button>
+    </div>
+    <span class="zoom-hint">Scroll to zoom · Drag to pan</span>
+  </div>
+
+  <div id="search-results"></div>
+
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
     const treeData = {
       name: "Start Here",
       children: [
+        { name: "AI & Machine Learning", children: [
+          { name: "OpenAI GPT-4o Launch",           link: "https://openai.com/index/hello-gpt-4o/" },
+          { name: "Claude 3.5 Sonnet Released",     link: "https://www.anthropic.com/news/claude-3-5-sonnet" },
+          { name: "Google Gemma Open Models",        link: "https://ai.google.dev/gemma" },
+          { name: "Meta Llama 3 Open Source",        link: "https://ai.meta.com/blog/meta-llama-3/" }
+        ]},
         { name: "BCI", children: [
-          { name: "Neuralink Human Implant", link: "https://www.theguardian.com/science/2025/feb/08/elon-musk-chip-paralysed-man-noland-arbaugh-chip-brain-neuralink" },
-          { name: "Speech Chip Translation", link: "https://example.com/speech-chip" }
-        ] },
+          { name: "Neuralink Human Implant",        link: "https://www.theguardian.com/science/2025/feb/08/elon-musk-chip-paralysed-man-noland-arbaugh-chip-brain-neuralink" },
+          { name: "Speech Chip Translation",        link: "https://www.nih.gov/news-events/nih-research-matters/brain-computer-interface-restores-natural-speech-after-paralysis" }
+        ]},
         { name: "Cybersecurity", children: [
-          { name: "Post-Quantum Encryption", link: "https://example.com/post-quantum" },
-          { name: "Zero Trust Networks", link: "https://example.com/zero-trust" }
-        ] },
+          { name: "Post-Quantum Encryption",        link: "https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards" },
+          { name: "Zero Trust Networks",            link: "https://www.cio.com/article/3962906/why-81-of-organizations-plan-to-adopt-zero-trust-by-2026.html" }
+        ]},
         { name: "Self-Driving Cars", children: [
-          { name: "Tesla Self-Driving Ride Sharing Network", link: "https://www.cnbc.com/2025/05/20/elon-musk-tesla-robotaxi.html" },
-          { name: "Tesla FSD Update", link: "https://example.com/tesla-fsd" }
-        ] },
+          { name: "Tesla Robotaxi Network",         link: "https://www.cnbc.com/2025/05/20/elon-musk-tesla-robotaxi.html" },
+          { name: "Tesla FSD v14",                  link: "https://electrek.co/2025/10/07/tesla-fsd-v14-release-notes/" },
+          { name: "Waymo One Expands Nationally",   link: "https://waymo.com/waymo-one/" }
+        ]},
         { name: "Quantum Computing", children: [
-          { name: "Qubit Stability Breakthrough", link: "https://example.com/qubit-stability" },
-          { name: "IBM 1000+ Qubit Demo", link: "https://example.com/ibm-qubits" }
-        ] },
+          { name: "Google Willow Qubit Breakthrough", link: "https://blog.google/innovation-and-ai/technology/research/google-willow-quantum-chip/" },
+          { name: "IBM 1000+ Qubit Processor",      link: "https://newsroom.ibm.com/quantum-computing" },
+          { name: "Microsoft Topological Qubits",   link: "https://azure.microsoft.com/en-us/blog/quantum/" }
+        ]},
         { name: "Robotics", children: [
-          { name: "Boston Dynamics AI", link: "https://example.com/boston-dynamics" },
-          { name: "Surgical Microbots", link: "https://example.com/microbots" }
-        ] },
+          { name: "Boston Dynamics & DeepMind",     link: "https://bostondynamics.com/blog/boston-dynamics-google-deepmind-form-new-ai-partnership/" },
+          { name: "Surgical Microbots Advance",     link: "https://www.aha.org/aha-center-health-innovation-market-scan/2025-03-04-3-ways-robotic-surgery-changing-health-care-year" },
+          { name: "Figure AI Humanoid Robot",       link: "https://www.figure.ai/" }
+        ]},
+        { name: "Space Technology", children: [
+          { name: "SpaceX Starship Latest",         link: "https://www.spacex.com/vehicles/starship/" },
+          { name: "NASA Artemis Program",           link: "https://www.nasa.gov/artemis/" },
+          { name: "Blue Origin New Glenn Flies",    link: "https://www.blueorigin.com/new-glenn" }
+        ]},
+        { name: "AR / VR", children: [
+          { name: "Apple Vision Pro Launch",        link: "https://www.apple.com/newsroom/2024/02/apple-vision-pro-available-in-the-united-states/" },
+          { name: "Meta Quest 3 Ships",             link: "https://about.meta.com/realitylabs/quest/" }
+        ]},
         { name: "IT & Cloud", children: [
-          { name: "AWS Lambda Enhancements", link: "https://example.com/aws-lambda" },
-          { name: "Edge Container Systems", link: "https://example.com/edge-containers" }
-        ] },
-         { name: "Software Development", children: [
-          { name: "Agentic Driven Development", link: "https://example.com/aws-lambda" },
-        ] },
-        { name: "Computer Hardware & Electronics", children: [
-          { name: "Apple M5 Architecture Leak", link: "https://example.com/apple-m5" },
-          { name: "NVIDIA's 5090 GPU Rumors", link: "https://example.com/nvidia-5090" }
-        ] }
+          { name: "AWS Lambda Durable Functions",   link: "https://aws.amazon.com/about-aws/whats-new/2025/12/lambda-durable-multi-step-applications-ai-workflows/" },
+          { name: "Kubernetes at the Edge",         link: "https://www.spectrocloud.com/blog/edge-computing-vs-cloud-computing-and-how-kubernetes-fits" }
+        ]},
+        { name: "Software Development", children: [
+          { name: "Agentic Coding in 2025",         link: "https://thenewstack.io/ai-engineering-trends-in-2025-agents-mcp-and-vibe-coding/" },
+          { name: "GitHub Copilot Workspace",       link: "https://github.blog/news-insights/product-news/github-copilot-workspace/" },
+          { name: "Model Context Protocol (MCP)",   link: "https://www.anthropic.com/news/model-context-protocol" }
+        ]},
+        { name: "Computer Hardware", children: [
+          { name: "Apple M4 Architecture",          link: "https://www.apple.com/newsroom/2024/05/apple-introduces-m4-chip/" },
+          { name: "NVIDIA RTX 5090 Released",       link: "https://www.nvidia.com/en-us/geforce/news/rtx-5090-5080-out-now/" },
+          { name: "AMD Ryzen 9000 Series",          link: "https://www.amd.com/en/products/processors/desktops/ryzen/9000-series.html" }
+        ]}
       ]
     };
 
-    const margin = { top: 20, right: 90, bottom: 30, left: 90 },
-          width = window.innerWidth - margin.left - margin.right,
-          height = window.innerHeight - margin.top - margin.bottom - 72;
+    // ── Dimensions ───────────────────────────────────────────────────────────
 
-    const svg = d3.select("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    const container = document.getElementById("tree-container");
+    const margin = { top: 30, right: 220, bottom: 30, left: 120 };
+
+    function getSize() {
+      const rect = container.getBoundingClientRect();
+      return {
+        width:  rect.width  - margin.left - margin.right,
+        height: rect.height - margin.top  - margin.bottom
+      };
+    }
+
+    let { width, height } = getSize();
+
+    // ── D3 Setup ─────────────────────────────────────────────────────────────
+
+    const svgEl = d3.select("#tree-container svg");
+    const g = svgEl.append("g");
+    let nodeId = 0;
+
+    const treeLayout = d3.tree();
+
+    // Zoom behavior
+    const zoom = d3.zoom()
+      .scaleExtent([0.15, 3])
+      .on("zoom", event => g.attr("transform", event.transform));
+
+    svgEl.call(zoom).on("dblclick.zoom", null);
+
+    function initialTransform() {
+      return d3.zoomIdentity.translate(margin.left, margin.top);
+    }
+
+    svgEl.call(zoom.transform, initialTransform());
+
+    // ── Tree State ───────────────────────────────────────────────────────────
 
     const root = d3.hierarchy(treeData);
     root.x0 = height / 2;
     root.y0 = 0;
-
-    const treeLayout = d3.tree().size([height, width]);
 
     function collapse(d) {
       if (d.children) {
@@ -100,93 +416,225 @@
         d.children = null;
       }
     }
+
+    function expandAll(d) {
+      if (d._children) { d.children = d._children; d._children = null; }
+      if (d.children)  d.children.forEach(expandAll);
+    }
+
+    function collapseAll(d) {
+      if (d.children) { d._children = d.children; d.children = null; }
+      if (d._children) d._children.forEach(collapseAll);
+    }
+
     root.children.forEach(collapse);
 
+    // ── Update ───────────────────────────────────────────────────────────────
+
     function update(source) {
-      const treeData = treeLayout(root);
-      const nodes = treeData.descendants();
-      const links = treeData.links();
+      const { width: w, height: h } = getSize();
+      treeLayout.size([h, w]);
 
-      nodes.forEach(d => d.y = d.depth * 180);
+      const tld   = treeLayout(root);
+      const nodes = tld.descendants();
+      const links = tld.links();
 
-      const node = svg.selectAll('g.node')
-        .data(nodes, d => d.id || (d.id = ++i));
+      nodes.forEach(d => d.y = d.depth * 210);
 
-      const nodeEnter = node.enter().append('g')
-        .attr('class', 'node')
-        .attr("transform", d => `translate(${source.y0},${source.x0})`)
+      // Nodes
+      const node = g.selectAll("g.node").data(nodes, d => d.id || (d.id = ++nodeId));
+
+      const nodeEnter = node.enter().append("g")
+        .attr("class", d => "node" + (d.data.link ? " leaf" : ""))
+        .attr("transform", () => `translate(${source.y0},${source.x0})`)
         .on("click", (event, d) => {
           if (d.data.link) {
-            window.open(d.data.link, '_blank');
+            window.open(d.data.link, "_blank", "noopener,noreferrer");
           } else {
             d.children = d.children ? null : d._children;
             update(d);
           }
         });
 
-      nodeEnter.append('circle')
-        .attr('r', 1e-6)
-        .style("fill", d => d._children ? "#4f46e5" : "#fff")
-        .style("stroke", "#4f46e5")
+      nodeEnter.append("circle")
+        .attr("r", 1e-6)
+        .style("fill",         d => d.data.link ? "#4f46e5" : (d._children ? "#4f46e5" : "#fff"))
+        .style("stroke",       "#4f46e5")
         .style("stroke-width", "2px");
 
-      nodeEnter.append('text')
+      nodeEnter.append("text")
         .attr("dy", ".35em")
-        .attr("x", d => d.children || d._children ? -13 : 13)
-        .attr("text-anchor", d => d.children || d._children ? "end" : "start")
+        .attr("x", d => (d.children || d._children) ? -13 : 13)
+        .attr("text-anchor", d => (d.children || d._children) ? "end" : "start")
+        .text(d => d.data.name);
+
+      // Append title for native tooltip on leaf nodes
+      nodeEnter.filter(d => d.data.link).append("title")
         .text(d => d.data.name);
 
       const nodeUpdate = nodeEnter.merge(node);
 
-      nodeUpdate.transition()
-        .duration(300)
+      nodeUpdate.transition().duration(280)
         .attr("transform", d => `translate(${d.y},${d.x})`);
 
-      nodeUpdate.select('circle')
-        .attr('r', 6)
-        .style("fill", d => d._children ? "#4f46e5" : "#fff");
+      nodeUpdate.select("circle")
+        .attr("r", d => d.data.link ? 7 : 6)
+        .style("fill", d => d.data.link ? "#4f46e5" : (d._children ? "#4f46e5" : "#fff"));
 
-      const nodeExit = node.exit().transition()
-        .duration(300)
-        .attr("transform", d => `translate(${source.y},${source.x})`)
-        .remove();
+      nodeUpdate.attr("class", d => "node" + (d.data.link ? " leaf" : ""));
 
-      nodeExit.select('circle')
-        .attr('r', 1e-6);
+      // Update text anchor when expand/collapse changes
+      nodeUpdate.select("text")
+        .attr("x", d => (d.children || d._children) ? -13 : 13)
+        .attr("text-anchor", d => (d.children || d._children) ? "end" : "start");
 
-      nodeExit.select('text')
-        .style('fill-opacity', 1e-6);
+      node.exit().transition().duration(280)
+        .attr("transform", () => `translate(${source.y},${source.x})`)
+        .remove()
+        .select("circle").attr("r", 1e-6);
 
-      const link = svg.selectAll('path.link')
-        .data(links, d => d.target.id);
+      // Links
+      const link = g.selectAll("path.link").data(links, d => d.target.id);
 
-      const linkEnter = link.enter().insert('path', "g")
+      link.enter().insert("path", "g")
         .attr("class", "link")
-        .attr('d', d => {
+        .attr("d", () => {
           const o = { x: source.x0, y: source.y0 };
-          return `M${o.y},${o.x}C${(o.y + d.y) / 2},${o.x} ${(o.y + d.y) / 2},${d.x} ${d.y},${d.x}`;
+          return `M${o.y},${o.x}C${o.y+90},${o.x} ${o.y+90},${o.x} ${o.y},${o.x}`;
+        })
+        .merge(link)
+        .transition().duration(280)
+        .attr("d", d => {
+          const mx = (d.source.y + d.target.y) / 2;
+          return `M${d.source.y},${d.source.x}C${mx},${d.source.x} ${mx},${d.target.x} ${d.target.y},${d.target.x}`;
         });
 
-      link.merge(linkEnter).transition()
-        .duration(300)
-        .attr('d', d => `M${d.source.y},${d.source.x}C${(d.source.y + d.target.y) / 2},${d.source.x} ${(d.source.y + d.target.y) / 2},${d.target.x} ${d.target.y},${d.target.x}`);
-
-      link.exit().transition()
-        .duration(300)
-        .attr('d', d => {
+      link.exit().transition().duration(280)
+        .attr("d", () => {
           const o = { x: source.x, y: source.y };
-          return `M${o.y},${o.x}C${(o.y + d.y) / 2},${o.x} ${(o.y + d.y) / 2},${d.x} ${d.y},${d.x}`;
+          return `M${o.y},${o.x}C${o.y+90},${o.x} ${o.y+90},${o.x} ${o.y},${o.x}`;
         })
         .remove();
 
-      nodes.forEach(d => {
-        d.x0 = d.x;
-        d.y0 = d.y;
-      });
+      nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
     }
 
-    let i = 0;
     update(root);
+
+    // ── Controls ─────────────────────────────────────────────────────────────
+
+    document.getElementById("btn-expand").addEventListener("click", () => {
+      expandAll(root);
+      update(root);
+    });
+
+    document.getElementById("btn-collapse").addEventListener("click", () => {
+      root.children.forEach(collapseAll);
+      update(root);
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      svgEl.transition().duration(500).call(zoom.transform, initialTransform());
+    });
+
+    // ── Resize ───────────────────────────────────────────────────────────────
+
+    window.addEventListener("resize", () => {
+      const s = getSize();
+      width = s.width; height = s.height;
+      update(root);
+    });
+
+    // ── Search ───────────────────────────────────────────────────────────────
+
+    const searchInput   = document.getElementById("search-input");
+    const clearBtn      = document.getElementById("clear-search");
+    const treeContainer = document.getElementById("tree-container");
+    const resultsPanel  = document.getElementById("search-results");
+
+    function clearSearch() {
+      searchInput.value = "";
+      clearBtn.style.display = "none";
+      treeContainer.style.display = "block";
+      resultsPanel.style.display  = "none";
+      resultsPanel.innerHTML      = "";
+    }
+
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.trim().toLowerCase();
+      clearBtn.style.display = query ? "block" : "none";
+      if (query) {
+        showResults(query);
+      } else {
+        clearSearch();
+      }
+    });
+
+    searchInput.addEventListener("keydown", e => {
+      if (e.key === "Escape") clearSearch();
+    });
+
+    clearBtn.addEventListener("click", clearSearch);
+
+    function showResults(query) {
+      treeContainer.style.display = "none";
+      resultsPanel.style.display  = "block";
+      resultsPanel.innerHTML      = "";
+
+      const groups = [];
+      treeData.children.forEach(category => {
+        const categoryMatch = category.name.toLowerCase().includes(query);
+        const itemMatches   = (category.children || []).filter(item =>
+          item.name.toLowerCase().includes(query)
+        );
+        // Show all items if category name matches, otherwise show matching items
+        const items = categoryMatch ? (category.children || []) : itemMatches;
+        if (items.length) {
+          groups.push({ category: category.name, items, categoryMatch });
+        }
+      });
+
+      if (!groups.length) {
+        resultsPanel.innerHTML = `
+          <div class="empty-results">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#aeaeb2" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              <line x1="8" y1="8" x2="14" y2="14"/><line x1="14" y1="8" x2="8" y2="14"/>
+            </svg>
+            <p>No results for "<strong>${searchInput.value}</strong>"</p>
+          </div>`;
+        return;
+      }
+
+      const count = groups.reduce((n, g) => n + g.items.length, 0);
+      const header = document.createElement("p");
+      header.className = "results-header";
+      header.textContent = `${count} result${count !== 1 ? "s" : ""} for "${searchInput.value}"`;
+      resultsPanel.appendChild(header);
+
+      groups.forEach(({ category, items }) => {
+        const section = document.createElement("div");
+        section.className = "result-category";
+        section.innerHTML = `<h3>${category}</h3>`;
+
+        items.forEach(item => {
+          const a = document.createElement("a");
+          a.className = "result-item";
+          a.href      = item.link;
+          a.target    = "_blank";
+          a.rel       = "noopener noreferrer";
+          a.innerHTML = `
+            <span>${item.name}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>`;
+          section.appendChild(a);
+        });
+
+        resultsPanel.appendChild(section);
+      });
+    }
   </script>
 </body>
 </html>
