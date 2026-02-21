@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Technologists Nexus</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
     * {
       margin: 0;
       padding: 0;
@@ -12,19 +14,41 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f7;
-      color: #1d1d1f;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background-color: #0d0b1e;
+      background-image:
+        radial-gradient(ellipse 70% 60% at 10% 5%,  rgba(99,102,241,0.28) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 55% at 90% 90%, rgba(139,92,246,0.22) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 45% at 75% 15%, rgba(59,130,246,0.18) 0%, transparent 60%);
+      background-attachment: fixed;
+      color: rgba(255,255,255,0.88);
     }
 
-    /* Header */
+    /* Dot-grid texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header, #tree-container, #search-results { position: relative; z-index: 1; }
+
+    /* ── Header ────────────────────────────────────────────────────────── */
     header {
-      background: #4f46e5;
-      padding: 20px 32px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 18px 32px;
     }
 
     .header-content {
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -32,56 +56,61 @@
       flex-wrap: wrap;
     }
 
-    .header-text {
-      flex: 0 0 auto;
-    }
+    .header-text { flex: 0 0 auto; }
 
     header h1 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 700;
       color: #fff;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 30%, rgba(167,139,250,0.9) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     header p.subtitle {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.65);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.45);
       margin-top: 2px;
+      letter-spacing: 0.01em;
     }
 
+    /* ── Search ────────────────────────────────────────────────────────── */
     .search-wrapper {
       position: relative;
       flex: 1;
       min-width: 200px;
-      max-width: 400px;
+      max-width: 420px;
     }
 
-    .search-wrapper svg {
+    .search-wrapper > svg {
       position: absolute;
       left: 13px;
       top: 50%;
       transform: translateY(-50%);
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.4);
       pointer-events: none;
     }
 
     #search-input {
       width: 100%;
       padding: 9px 36px 9px 38px;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
       font-family: inherit;
-      background: rgba(255,255,255,0.15);
-      border: 1.5px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
       border-radius: 980px;
       color: #fff;
       outline: none;
-      transition: background 0.2s, border-color 0.2s;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
 
-    #search-input::placeholder { color: rgba(255,255,255,0.5); }
+    #search-input::placeholder { color: rgba(255,255,255,0.35); }
     #search-input:focus {
-      background: rgba(255,255,255,0.22);
-      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(167,139,250,0.5);
+      box-shadow: 0 0 0 3px rgba(167,139,250,0.12);
     }
 
     #clear-search {
@@ -91,18 +120,19 @@
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.4);
       cursor: pointer;
       display: none;
       padding: 2px;
       line-height: 0;
+      transition: color 0.15s;
     }
-    #clear-search:hover { color: #fff; }
+    #clear-search:hover { color: rgba(255,255,255,0.8); }
 
-    /* Tree container */
+    /* ── Tree container ────────────────────────────────────────────────── */
     #tree-container {
       width: 100%;
-      height: calc(100vh - 84px);
+      height: calc(100vh - 80px);
       overflow: hidden;
       position: relative;
     }
@@ -115,119 +145,142 @@
 
     #tree-container svg:active { cursor: grabbing; }
 
+    /* ── Tree nodes ────────────────────────────────────────────────────── */
     .node circle {
       cursor: pointer;
-      transition: r 0.15s;
+      transition: filter 0.2s, r 0.15s;
+    }
+
+    .node:hover circle {
+      filter: drop-shadow(0 0 7px rgba(167,139,250,0.55));
     }
 
     .node text {
-      font-size: 12.5px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      fill: #1d1d1f;
+      font-size: 12px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      fill: rgba(255,255,255,0.82);
       pointer-events: none;
       user-select: none;
     }
 
+    .node.leaf circle {
+      filter: drop-shadow(0 0 4px rgba(129,140,248,0.45));
+    }
+
+    .node.leaf:hover circle {
+      filter: drop-shadow(0 0 9px rgba(129,140,248,0.75));
+    }
+
     .node.leaf text {
-      fill: #4f46e5;
+      fill: #a5b4fc;
       text-decoration: underline;
+      text-underline-offset: 2px;
       cursor: pointer;
     }
 
-    .node.dimmed circle { opacity: 0.2; }
-    .node.dimmed text   { opacity: 0.2; }
-
-    .node.highlighted circle {
-      filter: drop-shadow(0 0 4px rgba(79,70,229,0.5));
-    }
+    .node.dimmed circle { opacity: 0.15; }
+    .node.dimmed text   { opacity: 0.15; }
 
     .link {
       fill: none;
-      stroke: #d2d2d7;
+      stroke: rgba(255,255,255,0.1);
       stroke-width: 1.5px;
     }
 
-    /* Floating controls */
+    /* ── Floating controls ─────────────────────────────────────────────── */
     .tree-controls {
       position: absolute;
-      bottom: 16px;
-      right: 16px;
+      bottom: 18px;
+      right: 18px;
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
     .ctrl-btn {
-      padding: 6px 12px;
-      font-size: 0.75rem;
+      padding: 7px 14px;
+      font-size: 0.72rem;
       font-family: inherit;
       font-weight: 500;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid #e5e5ea;
-      border-radius: 8px;
-      color: #1d1d1f;
+      letter-spacing: 0.02em;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.75);
       cursor: pointer;
-      backdrop-filter: blur(8px);
-      transition: background 0.15s, box-shadow 0.15s;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
       white-space: nowrap;
     }
+
     .ctrl-btn:hover {
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.13);
+      border-color: rgba(255,255,255,0.22);
+      color: #fff;
     }
 
-    /* Legend */
+    /* ── Legend ────────────────────────────────────────────────────────── */
     .legend {
       position: absolute;
-      bottom: 16px;
-      left: 16px;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid #e5e5ea;
-      border-radius: 10px;
-      padding: 9px 13px;
-      font-size: 0.72rem;
-      color: #6e6e73;
-      backdrop-filter: blur(8px);
+      bottom: 18px;
+      left: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
 
     .legend div {
       display: flex;
       align-items: center;
-      gap: 7px;
-      margin-bottom: 3px;
+      gap: 8px;
+      margin-bottom: 4px;
     }
     .legend div:last-child { margin-bottom: 0; }
 
     .legend-dot {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .legend-dot.category { background: #fff; border: 2px solid #4f46e5; }
-    .legend-dot.leaf     { background: #4f46e5; }
-
-    /* Zoom hint */
-    .zoom-hint {
-      position: absolute;
-      top: 10px;
-      right: 16px;
-      font-size: 0.7rem;
-      color: #aeaeb2;
+    .legend-dot.category {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.45);
+    }
+    .legend-dot.leaf {
+      background: #818cf8;
+      box-shadow: 0 0 5px rgba(129,140,248,0.6);
     }
 
-    /* Search results panel */
+    /* ── Zoom hint ─────────────────────────────────────────────────────── */
+    .zoom-hint {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Search results panel ──────────────────────────────────────────── */
     #search-results {
       display: none;
-      max-width: 860px;
-      margin: 28px auto;
+      max-width: 820px;
+      margin: 32px auto;
       padding: 0 24px;
     }
 
     .results-header {
-      font-size: 0.85rem;
-      color: #6e6e73;
-      margin-bottom: 18px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 20px;
+      letter-spacing: 0.01em;
     }
 
     .result-category {
@@ -235,39 +288,45 @@
     }
 
     .result-category h3 {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #6e6e73;
+      letter-spacing: 0.1em;
+      color: rgba(167,139,250,0.7);
       margin-bottom: 8px;
     }
 
     .result-item {
       display: flex;
       align-items: center;
-      padding: 13px 16px;
-      background: #fff;
-      border: 1px solid #e5e5ea;
-      border-radius: 10px;
+      padding: 13px 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
       margin-bottom: 7px;
       text-decoration: none;
-      color: #1d1d1f;
-      transition: box-shadow 0.2s, transform 0.15s;
+      color: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
     }
+
     .result-item:hover {
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(167,139,250,0.3);
       transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(167,139,250,0.1);
     }
-    .result-item svg { flex-shrink: 0; margin-left: auto; color: #aeaeb2; }
-    .result-item span { font-size: 0.92rem; font-weight: 500; }
+
+    .result-item svg { flex-shrink: 0; margin-left: auto; color: rgba(255,255,255,0.25); }
+    .result-item span { font-size: 0.9rem; font-weight: 500; }
 
     .empty-results {
       text-align: center;
-      padding: 60px 20px;
-      color: #6e6e73;
+      padding: 72px 20px;
+      color: rgba(255,255,255,0.3);
     }
-    .empty-results p { font-size: 1rem; margin-top: 12px; }
+    .empty-results p { font-size: 0.95rem; margin-top: 14px; }
   </style>
 </head>
 <body>
@@ -458,9 +517,9 @@
 
       nodeEnter.append("circle")
         .attr("r", 1e-6)
-        .style("fill",         d => d.data.link ? "#4f46e5" : (d._children ? "#4f46e5" : "#fff"))
-        .style("stroke",       "#4f46e5")
-        .style("stroke-width", "2px");
+        .style("fill",         d => d.data.link ? "#818cf8" : (d._children ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)"))
+        .style("stroke",       d => d.data.link ? "#818cf8" : "rgba(255,255,255,0.4)")
+        .style("stroke-width", d => d.data.link ? "0" : "1.5px");
 
       nodeEnter.append("text")
         .attr("dy", ".35em")
@@ -478,8 +537,10 @@
         .attr("transform", d => `translate(${d.y},${d.x})`);
 
       nodeUpdate.select("circle")
-        .attr("r", d => d.data.link ? 7 : 6)
-        .style("fill", d => d.data.link ? "#4f46e5" : (d._children ? "#4f46e5" : "#fff"));
+        .attr("r", d => d.data.link ? 6 : 5)
+        .style("fill",   d => d.data.link ? "#818cf8" : (d._children ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.06)"))
+        .style("stroke", d => d.data.link ? "#818cf8" : "rgba(255,255,255,0.4)")
+        .style("stroke-width", d => d.data.link ? "0" : "1.5px");
 
       nodeUpdate.attr("class", d => "node" + (d.data.link ? " leaf" : ""));
 
@@ -597,7 +658,7 @@
       if (!groups.length) {
         resultsPanel.innerHTML = `
           <div class="empty-results">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#aeaeb2" stroke-width="1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               <line x1="8" y1="8" x2="14" y2="14"/><line x1="14" y1="8" x2="8" y2="14"/>
             </svg>
